@@ -1,11 +1,11 @@
 # dataset settings
-data_keys = ['motion', 'motion_mask', 'motion_length', 'clip_feat']
-meta_keys = ['text', 'token']
+data_keys = ['motion', 'motion_mask', 'motion_length']
+meta_keys = ['text']
 train_pipeline = [
     dict(
         type='Normalize',
-        mean_path='data/datasets/human_ml3d/mean.npy',
-        std_path='data/datasets/human_ml3d/std.npy'),
+        mean_path='data/datasets/human_ml3d/mean_std/Mean.npy',
+        std_path='data/datasets/human_ml3d/mean_std/Std.npy'),
     dict(type='Crop', crop_size=196),
     dict(type='ToTensor', keys=data_keys),
     dict(type='Collect', keys=data_keys, meta_keys=meta_keys)
@@ -21,11 +21,9 @@ data = dict(
             dataset_name='human_ml3d',
             data_prefix='data',
             pipeline=train_pipeline,
-            ann_file='train.txt',
-            motion_dir='motions',
+            ann_file='split/train.txt',
+            motion_dir='motion_data',
             text_dir='texts',
-            token_dir='tokens',
-            clip_feat_dir='clip_feats',
         ),
         times=200
     ),
@@ -34,11 +32,9 @@ data = dict(
         dataset_name='human_ml3d',
         data_prefix='data',
         pipeline=train_pipeline,
-        ann_file='test.txt',
-        motion_dir='motions',
+        ann_file='split/test.txt',
+        motion_dir='motion_data',
         text_dir='texts',
-        token_dir='tokens',
-        clip_feat_dir='clip_feats',
         eval_cfg=dict(
             shuffle_indexes=True,
             replication_times=20,

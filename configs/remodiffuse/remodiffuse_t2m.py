@@ -23,7 +23,7 @@ log_config = dict(
         # dict(type='TensorboardLoggerHook')
     ])
 
-input_feats = 263
+input_feats = 272
 max_seq_len = 196
 latent_dim = 512
 time_embed_dim = 2048
