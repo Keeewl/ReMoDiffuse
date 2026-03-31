@@ -201,7 +201,7 @@ def main():
         args.output,
         motions=motions,
         m_lengths=m_lengths,
-        captions=np.array(captions, dtype=object),
+        captions=np.array(captions, dtype=str),
         text_features=text_features,
         clip_seq_features=clip_seq_features,
     )
