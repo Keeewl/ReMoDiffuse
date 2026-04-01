@@ -61,7 +61,14 @@ class TextMotionDataset(BaseMotionDataset):
         text_path = os.path.join(self.text_dir, name + '.txt')
         text_data = []
         for line in open(text_path, 'r'):
-            text_data.append(line.strip())
+            line = line.strip()
+            if not line:
+                continue
+            caption = line.split('#')[0].strip()
+            if caption:
+                text_data.append(caption)
+        if len(text_data) == 0:
+            text_data.append('')
         results['text'] = text_data
         if self.token_dir is not None:
             token_path = os.path.join(self.token_dir, name + '.txt')

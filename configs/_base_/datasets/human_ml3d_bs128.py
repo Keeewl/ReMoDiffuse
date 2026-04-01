@@ -35,22 +35,7 @@ data = dict(
         ann_file='split/test.txt',
         motion_dir='motion_data',
         text_dir='texts',
-        eval_cfg=dict(
-            shuffle_indexes=True,
-            replication_times=20,
-            replication_reduction='statistics',
-            text_encoder_name='human_ml3d',
-            text_encoder_path='data/evaluators/human_ml3d/finest.tar',
-            motion_encoder_name='human_ml3d',
-            motion_encoder_path='data/evaluators/human_ml3d/finest.tar',
-            metrics=[
-                dict(type='R Precision', batch_size=32, top_k=3),
-                dict(type='Matching Score', batch_size=32),
-                dict(type='FID'),
-                dict(type='Diversity', num_samples=300),
-                dict(type='MultiModality', num_samples=100, num_repeats=30, num_picks=10)
-            ]
-        ),
-        test_mode=True
+        eval_cfg=None,
+        test_mode=False
     )
 )

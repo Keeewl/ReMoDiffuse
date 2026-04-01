@@ -67,6 +67,16 @@ def parse_args():
         help="Output npz path.",
     )
     parser.add_argument(
+        "--mean-path",
+        default=None,
+        help="Mean.npy path for normalization. Defaults to data-root/mean_std/Mean.npy",
+    )
+    parser.add_argument(
+        "--std-path",
+        default=None,
+        help="Std.npy path for normalization. Defaults to data-root/mean_std/Std.npy",
+    )
+    parser.add_argument(
         "--max-samples",
         type=int,
         default=None,
@@ -110,6 +120,8 @@ def main():
     split_path = os.path.join(data_root, args.split_file)
     motion_root = os.path.join(data_root, args.motion_dir)
     text_root = os.path.join(data_root, args.text_dir)
+    mean_path = args.mean_path or os.path.join(data_root, "mean_std", "Mean.npy")
+    std_path = args.std_path or os.path.join(data_root, "mean_std", "Std.npy")
 
     if not os.path.exists(split_path):
         raise SystemExit(f"Split file not found: {split_path}")
@@ -117,6 +129,10 @@ def main():
         raise SystemExit(f"Motion dir not found: {motion_root}")
     if not os.path.isdir(text_root):
         raise SystemExit(f"Text dir not found: {text_root}")
+    if not os.path.isfile(mean_path):
+        raise SystemExit(f"Mean file not found: {mean_path}")
+    if not os.path.isfile(std_path):
+        raise SystemExit(f"Std file not found: {std_path}")
 
     with open(split_path, "r") as f:
         ids = [line.strip() for line in f if line.strip()]
@@ -130,6 +146,12 @@ def main():
     if sample_motion.ndim != 2:
         raise SystemExit("Motion file should be (T, D).")
     feat_dim = sample_motion.shape[1]
+    mean = np.load(mean_path).astype(np.float32).reshape(1, -1)
+    std = np.load(std_path).astype(np.float32).reshape(1, -1)
+    if mean.shape[1] != feat_dim or std.shape[1] != feat_dim:
+        raise SystemExit(
+            f"Mean/Std dim mismatch: mean {mean.shape[1]}, std {std.shape[1]}, motion {feat_dim}"
+        )
 
     num_samples = len(ids)
     motions = np.zeros((num_samples, args.max_seq_len, feat_dim), dtype=np.float32)
@@ -150,6 +172,7 @@ def main():
             raise SystemExit(
                 f"Feature dim mismatch at {name}: {motion.shape[1]} vs {feat_dim}"
             )
+        motion = (motion - mean) / (std + 1e-9)
         motion, length = pad_or_crop_motion(motion, args.max_seq_len)
         motions[i] = motion
         m_lengths[i] = length
